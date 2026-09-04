@@ -18,6 +18,7 @@ async function createManualEntry() {
   console.log('Bypassing external APIs. Archiving clean data locally.\n');
 
   const title = await askQuestion('Anime/Manga Title: ');
+  const cover = await askQuestion('Cover Image URL (optional): ');
   const category = await askQuestion('Category (e.g., Classic Anime, Manga Archive): ');
   const summary = await askQuestion('Short Summary / Logline: ');
   const synopsis = await askQuestion('Full Synopsis / Notes: ');
@@ -37,6 +38,7 @@ async function createManualEntry() {
 
   const fileContent = `---
 title: "${title.replace(/"/g, '\\"')}"
+cover: "${cover || ''}"
 date: "${new Date().toISOString().split('T')[0]}"
 category: "${category || 'Archive'}"
 summary: "${summary.replace(/"/g, '\\"')}"
@@ -56,7 +58,7 @@ ${synopsis}
 
   fs.writeFileSync(filePath, fileContent, 'utf8');
   console.log(`\n[+] Successfully locked and loaded: src/content/${slug}.md`);
-  
+
   rl.close();
 }
 

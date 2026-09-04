@@ -10,6 +10,12 @@ export interface VaultItem {
   cover?: string;
   date: string;
   category: string;
+  score?: string;
+  ageRating?: string;
+  year?: string;
+  status?: string;
+  genres?: string[];
+  sources?: string[];
   summary: string;
   content: string;
 }
@@ -18,7 +24,6 @@ export function getAllVaultItems(): VaultItem[] {
   if (!fs.existsSync(contentDirectory)) return [];
 
   const files = fs.readdirSync(contentDirectory);
-
   const items = files
     .filter((file) => file.endsWith('.md'))
     .map((file) => {
@@ -27,18 +32,22 @@ export function getAllVaultItems(): VaultItem[] {
       const fileContents = fs.readFileSync(fullPath, 'utf8');
       const { data, content } = matter(fileContents);
 
-      console.log(`getVaultItems: ${data}`)
-
       return {
         slug,
         title: data.title || 'Untitled',
-        cover: data.cover || data.image || 'no-cover',
+        cover: data.cover || data.image || '',
         date: data.date || '',
         category: data.category || 'General',
+        score: data.score || '',
+        ageRating: data.ageRating || '',
+        year: data.year || '',
+        status: data.status || '',
+        genres: Array.isArray(data.genres) ? data.genres : (data.genres ? data.genres.split(',').map((s: string) => s.trim()) : []),
+        sources: Array.isArray(data.sources) ? data.sources : (data.sources ? data.sources.split(',').map((s: string) => s.trim()) : []),
         summary: data.summary || '',
         content,
       };
     });
 
-  return items.sort((a: VaultItem, b: VaultItem) => (a.date > b.date ? -1 : 1));
+  return items.sort((a, b) => (a.date > b.date ? -1 : 1));
 }
