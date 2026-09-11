@@ -45,9 +45,16 @@ summary: "${summary.replace(/"/g, '\\"')}"
 ---
 
 ### Synopsis / Details
+---
+&emsp;
+
 ${synopsis}
 
+&emsp;
 ### Preservation Status
+---
+&emsp;
+
 - **Source Integrity:** Manually verified and locked.
 - **Local Checksum:** Secure.
 `;

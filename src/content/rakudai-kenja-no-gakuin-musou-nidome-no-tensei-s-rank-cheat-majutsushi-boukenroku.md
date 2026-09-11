@@ -1,10 +1,19 @@
 ---
 title: "Rakudai Kenja no Gakuin Musou: Nidome no Tensei, S-Rank Cheat Majutsushi Boukenroku"
-cover: "https://anify.to/images/from-overshadowed-to-overpowered-second-reincarnation-of-a-talentless-sage.jpg"
-date: "2026-08-20"
+date: "2026-09-11"
+updated: "2026-09-11"
 category: "Anime"
+cover: "https://anify.to/images/from-overshadowed-to-overpowered-second-reincarnation-of-a-talentless-sage.jpg"
+score: "6.80"
+ageRating: "N/A"
+year: "2026"
+status: "Completed"
+genres: "ACtion, Adventure, Fantasy, Reincarnation"
+sources: "MAL, TVDB"
 summary: "rakudai-kenja-no-gakuin-musou-nidome-no-tensei-s-rank-cheat-majutsushi-boukenroku"
 ---
+
+### Description
 
 ### **Synopsis / Details**
 ---
@@ -18,4 +27,9 @@ The Sage of Wind, Ephtal is a reincarnated human, coming from modern Earth. Rein
 &emsp;
 
 - **Source Integrity:** Manually verified and locked.
+- **Local Checksum:** Secure.
+
+
+### Preservation Status
+- **Source Integrity:** Verified and locked.
 - **Local Checksum:** Secure.

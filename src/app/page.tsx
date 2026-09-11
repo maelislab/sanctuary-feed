@@ -44,10 +44,26 @@ export default function SanctuaryHome() {
                 <div className="absolute top-0 left-0 w-1 h-full bg-amber-500/40" />
 
                 <div className="flex justify-between items-start mb-4">
-                  <span className="text-xs text-amber-500/80 font-semibold tracking-wider uppercase">
-                    {item.category}
-                  </span>
-                  <span className="text-xs text-[#8C8275]">{item.date}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-amber-500/80 font-semibold tracking-wider uppercase">
+                      {item.category}
+                    </span>
+                    <Link
+                      href={`/edit/${item.slug}`}
+                      className="text-[10px] uppercase px-2 py-0.5 bg-[#1C1A18] border border-[#2A2724] hover:border-amber-500/50 text-[#B3ACA1] hover:text-amber-400 transition-colors"
+                    >
+                      [Edit]
+                    </Link>
+                  </div>
+
+                  <div className="text-right">
+                    <span className="text-xs text-[#8C8275] block">Added: {item.date}</span>
+                    {item.updated && (
+                      <span className="text-[10px] text-amber-500/70 block">
+                        [Updated: {item.updated}]
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <h2 className="text-xl font-bold text-[#F5F2EB] mb-4">{item.title}</h2>

@@ -9,6 +9,7 @@ export interface VaultItem {
   title: string;
   cover?: string;
   date: string;
+  updated?: string;
   category: string;
   score?: string;
   ageRating?: string;
@@ -37,6 +38,7 @@ export function getAllVaultItems(): VaultItem[] {
         title: data.title || 'Untitled',
         cover: data.cover || data.image || '',
         date: data.date || '',
+        updated: data.updated || '',
         category: data.category || 'General',
         score: data.score || '',
         ageRating: data.ageRating || '',
