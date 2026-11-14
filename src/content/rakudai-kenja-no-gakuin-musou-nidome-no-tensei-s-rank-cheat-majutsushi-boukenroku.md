@@ -8,7 +8,7 @@ score: "6.80"
 ageRating: "N/A"
 year: "2026"
 status: "Completed"
-genres: "ACtion, Adventure, Fantasy, Reincarnation"
+genres: "Action, Adventure, Fantasy, Reincarnation"
 sources: "MAL, TVDB"
 summary: "rakudai-kenja-no-gakuin-musou-nidome-no-tensei-s-rank-cheat-majutsushi-boukenroku"
 ---

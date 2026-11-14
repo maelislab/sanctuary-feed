@@ -1,15 +1,33 @@
 // src/app/page.tsx
 import { getAllVaultItems, VaultItem } from '@/lib/vault';
-import path from 'path';
 import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
 
-export default function SanctuaryHome() {
-  const items: VaultItem[] = getAllVaultItems();
+interface PageProps {
+  searchParams: Promise<{
+    search?: string;
+    category?: string;
+  }>;
+}
+
+export default async function SanctuaryHome({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const searchQuery: string = params.search || '';
+  const selectedCategory: string = params.category || 'All';
+
+  const items: VaultItem[] = await getAllVaultItems({
+    search: searchQuery,
+    category: selectedCategory,
+  });
+
+  const safeItems: VaultItem[] = Array.isArray(items) ? items : [];
+  const categories: string[] = ['All', 'Anime', 'Manga', 'Visual Novel', 'Archive'];
+
 
   return (
     <main className="min-h-screen bg-[#121110] text-[#E6E1DA] p-8 font-mono">
       <div className="max-w-3xl mx-auto">
+        {/* Header */}
         <header className="border-b border-[#2A2724] pb-6 mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-amber-500">SANCTUARY // MEDIA VAULT</h1>
@@ -31,12 +49,64 @@ export default function SanctuaryHome() {
           </div>
         </header>
 
+        {/* Search & Filter Toolbar */}
+        <section className="border-b border-[#2A2724] pb-6 mb-8">
+          <form method="GET" className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-[#181614] border border-[#2A2724] p-4 w-auto">
+            <div className="md:col-span-3">
+              <input
+                type="text"
+                name="search"
+                defaultValue={searchQuery}
+                placeholder="Search by title, summary, or genre..."
+                className="w-full bg-[#121110] border border-[#2A2724] p-3 text-sm text-[#F5F2EB] focus:outline-none focus:border-amber-500"
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                className="flex-1 bg-[#221F1C] hover:bg-amber-500/20 border border-[#2A2724] text-amber-500 text-xs font-bold uppercase tracking-wider transition-colors"
+              >
+                Filter
+              </button>
+              {searchQuery || selectedCategory !== 'All' ? (
+                <Link
+                  href="/"
+                  className="px-3 flex items-center justify-center bg-[#121110] border border-[#2A2724] text-xs text-[#8C8275] hover:text-[#E6E1DA]"
+                >
+                  Reset
+                </Link>
+              ) : null}
+            </div>
+
+            {/* Category Filter Pills */}
+            <div className="md:col-span-4 flex flex-wrap gap-2 pt-2 border-t border-[#2A2724]">
+              {categories.map((cat) => {
+                const isActive = selectedCategory === cat;
+                const href = `/?${searchQuery ? `search=${encodeURIComponent(searchQuery)}&` : ''}category=${encodeURIComponent(cat)}`;
+                return (
+                  <Link
+                    key={cat}
+                    href={href}
+                    className={`text-xs px-3 py-1 border transition-colors ${isActive
+                        ? 'bg-amber-500 text-[#121110] border-amber-500 font-bold'
+                        : 'bg-[#121110] text-[#8C8275] border-[#2A2724] hover:border-amber-500/50'
+                      }`}
+                  >
+                    {cat}
+                  </Link>
+                );
+              })}
+            </div>
+          </form>
+        </section>
+
+
         <section className="space-y-6">
-          {items.length === 0 ? (
+          {safeItems.length === 0 ? (
             <p className="text-[#8C8275] italic">Vault is empty. Run your ingress script to populate content.</p>
           ) : (
             // src/app/page.tsx snippet for rendering each article card
-            items.map((item) => (
+            safeItems.map((item) => (
               <article
                 key={item.slug}
                 className="bg-[#181614] border border-[#2A2724] hover:border-amber-500/50 transition-colors p-6 rounded-none shadow-lg relative overflow-hidden"
