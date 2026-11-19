@@ -1,8 +1,6 @@
-import path from 'path';
 import { db } from '@/db';
-import { vaultItems } from '@/db/schema';
-import { desc, like, or, eq, and } from 'drizzle-orm';
-
+import { episodes, seasons, vaultItems } from '@/db/schema';
+import { and, desc, eq, like, or, sql } from 'drizzle-orm';
 
 export interface VaultItem {
   id: number;
@@ -16,13 +14,20 @@ export interface VaultItem {
   ageRating?: string | null;
   year?: string | null;
   status?: string | null;
-  genres?: string[] | null;
+  genres?: string[];
   sources?: string[];
-  summary?: string | null;
+  summary: string;
   content: string;
+  seasonsCount: number;
+  watchedEpisodes: number;
+  totalEpisodes: number;
 }
 
-export async function getAllVaultItems(filters?: { search?: string; category?: string }): Promise<VaultItem[]> {
+export async function getAllVaultItems(filters?: {
+  search?: string;
+  category?: string;
+  status?: string;
+}): Promise<VaultItem[]> {
   try {
     const conditions = [];
 
@@ -34,22 +39,41 @@ export async function getAllVaultItems(filters?: { search?: string; category?: s
           like(vaultItems.summary, searchTerm),
           like(vaultItems.genres, searchTerm)
         )
-      )
+      );
     }
 
     if (filters?.category && filters.category !== 'All') {
       conditions.push(eq(vaultItems.category, filters.category));
     }
 
-    const queryBuilder = db.select().from(vaultItems);
+    if (filters?.status && filters.status !== 'All') {
+      conditions.push(eq(vaultItems.status, filters.status));
+    }
 
-    const items = conditions.length > 0
-      ? await queryBuilder.where(and(...conditions)).orderBy(desc(vaultItems.date))
-      : await queryBuilder.orderBy(desc(vaultItems.date));
+    const baseQuery = db
+      .select({
+        item: vaultItems,
+        seasonsCount: sql<number>`count(distinct ${seasons.id})`,
+        totalEpisodes: sql<number>`count(${episodes.id})`,
+        watchedEpisodes: sql<number>`coalesce(sum(case when ${episodes.watched} = 1 then 1 else 0 end), 0)`,
+      })
+      .from(vaultItems)
+      .leftJoin(seasons, eq(seasons.vaultItemId, vaultItems.id))
+      .leftJoin(episodes, eq(episodes.seasonId, seasons.id));
 
-    if (!Array.isArray(items)) return [];
+    const rows =
+      conditions.length > 0
+        ? await baseQuery
+          .where(and(...conditions))
+          .groupBy(vaultItems.id)
+          .orderBy(desc(vaultItems.date))
+        : await baseQuery
+          .groupBy(vaultItems.id)
+          .orderBy(desc(vaultItems.date));
 
-    return items.map((item) => ({
+    if (!Array.isArray(rows)) return [];
+
+    return rows.map(({ item, seasonsCount, totalEpisodes, watchedEpisodes }) => ({
       ...item,
       cover: item.cover || undefined,
       score: item.score || undefined,
@@ -57,11 +81,15 @@ export async function getAllVaultItems(filters?: { search?: string; category?: s
       year: item.year || undefined,
       status: item.status || undefined,
       updated: item.updated || undefined,
-      genres: item.genres ? item.genres.split(',').map((g: string) => g.trim()) : [],
-      sources: item.sources ? item.sources.split(',').map((s: string) => s.trim()) : []
+      summary: item.summary || '',
+      genres: item.genres ? item.genres.split(',').map((g) => g.trim()) : [],
+      sources: item.sources ? item.sources.split(',').map((s) => s.trim()) : [],
+      seasonsCount: Number(seasonsCount) || 0,
+      totalEpisodes: Number(totalEpisodes) || 0,
+      watchedEpisodes: Number(watchedEpisodes) || 0,
     }));
   } catch (error) {
     console.error('Failed to fetch vault items from SQLite:', error);
     return [];
   }
-};
+}
